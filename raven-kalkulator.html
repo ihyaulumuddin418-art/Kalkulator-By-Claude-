@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raven Kalkulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F8F8F6;
+  --surface: #FFFFFF;
+  --surface2: #F2F2F0;
+  --border: #E0E0DC;
+  --border2: #CACAC6;
+  --ink: #0A0A0A;
+  --ink2: #3A3A3A;
+  --ink3: #6A6A6A;
+  --ink4: #9A9A9A;
+  --accent: #0A0A0A;
+  --accent-soft: #1A1A1A;
+  --white: #FFFFFF;
+  --red: #C0392B;
+  --green: #1A6B3A;
+  --r: 12px;
+  --r-sm: 8px;
+  --r-lg: 18px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.10), 0 8px 32px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.12), 0 16px 48px rgba(0,0,0,0.10);
+  --trans: all 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+
+html { font-size: 16px; }
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes ripple {
+  from { transform: scale(0); opacity: 0.4; }
+  to { transform: scale(2.5); opacity: 0; }
+}
+@keyframes numFlip {
+  0% { transform: translateY(-8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.fade-up { animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) both; }
+.fade-up-1 { animation-delay: 0.05s; }
+.fade-up-2 { animation-delay: 0.10s; }
+.fade-up-3 { animation-delay: 0.15s; }
+.fade-up-4 { animation-delay: 0.20s; }
+.fade-up-5 { animation-delay: 0.25s; }
+
+/* ===== LAYOUT ===== */
+.app-wrapper {
+  display: flex;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  gap: 24px;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  animation: fadeUp 0.5s ease both;
+}
+.brand {
+  padding: 20px 0 28px;
+}
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.brand-icon {
+  width: 36px; height: 36px;
+  background: var(--ink);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.brand-icon svg { width: 20px; height: 20px; }
+.brand-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  line-height: 1;
+}
+.brand-tagline {
+  font-size: 0.68rem;
+  color: var(--ink4);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-left: 46px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.nav-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink4);
+  padding: 0 12px;
+  margin-bottom: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.nav-list { list-style: none; margin-bottom: 24px; }
+.nav-item {
+  margin-bottom: 2px;
+}
+.nav-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink3);
+  transition: var(--trans);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+.nav-btn:hover { background: var(--surface2); color: var(--ink); }
+.nav-btn.active {
+  background: var(--ink);
+  color: var(--white);
+}
+.nav-btn .nav-icon {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.08);
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+.nav-btn:not(.active) .nav-icon { background: var(--surface2); }
+.nav-btn.active .nav-icon { background: rgba(255,255,255,0.15); }
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+/* ===== DISPLAY ===== */
+.display-card {
+  background: var(--ink);
+  border-color: transparent;
+  color: var(--white);
+  padding: 24px 24px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.display-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.display-card::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: -30px;
+  width: 200px; height: 200px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.display-mode-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 12px;
+}
+.display-history {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.35);
+  text-align: right;
+  min-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 4px;
+}
+.display-expr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.5);
+  text-align: right;
+  min-height: 22px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 8px;
+}
+.display-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.8rem;
+  font-weight: 500;
+  color: var(--white);
+  text-align: right;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  animation: numFlip 0.18s ease both;
+}
+.display-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.memory-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.08);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.memory-badge.active { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.18); }
+.export-btn {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: var(--trans);
+}
+.export-btn:hover { background: rgba(255,255,255,0.15); color: var(--white); }
+
+/* ===== BUTTONS GRID ===== */
+.btn-grid {
+  display: grid;
+  gap: 8px;
+}
+.btn-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.btn-grid-5 { grid-template-columns: repeat(5, 1fr); }
+
+.calc-btn {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface2);
+  color: var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0;
+  height: 54px;
+  cursor: pointer;
+  transition: var(--trans);
+  display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.calc-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.10); }
+.calc-btn:active { transform: translateY(0) scale(0.97); }
+
+.calc-btn.dark { background: var(--ink); color: var(--white); border-color: var(--ink); }
+.calc-btn.dark:hover { background: #222; }
+.calc-btn.op { background: #F0F0EE; color: var(--ink); font-size: 1.1rem; }
+.calc-btn.op:hover { background: #E5E5E3; }
+.calc-btn.eq { background: var(--ink); color: var(--white); border-color: var(--ink); font-size: 1.1rem; }
+.calc-btn.red { background: #FFF0EF; color: var(--red); border-color: #FFD6D3; }
+.calc-btn.red:hover { background: #FFE0DE; }
+.calc-btn.span2 { grid-column: span 2; }
+.calc-btn.span3 { grid-column: span 3; }
+.calc-btn.sm { font-size: 0.72rem; height: 46px; padding: 0 6px; font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: -0.01em; }
+.calc-btn.xs { font-size: 0.68rem; height: 42px; padding: 0 4px; }
+
+.ripple-el {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.15);
+  pointer-events: none;
+  transform: scale(0);
+  animation: ripple 0.4s linear;
+}
+.calc-btn.dark .ripple-el { background: rgba(255,255,255,0.2); }
+
+/* ===== TABS ===== */
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  background: var(--surface2);
+  border-radius: var(--r-sm);
+  padding: 4px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 7px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink3);
+  cursor: pointer;
+  transition: var(--trans);
+}
+.tab-btn.active {
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* ===== SECTION PANELS ===== */
+.mode-panel { display: none; animation: slideIn 0.25s ease both; }
+.mode-panel.active { display: block; }
+
+/* ===== HISTORY PANEL ===== */
+.history-panel {
+  max-height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.history-panel::-webkit-scrollbar { width: 3px; }
+.history-panel::-webkit-scrollbar-track { background: transparent; }
+.history-panel::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: var(--trans);
+  animation: fadeIn 0.2s ease both;
+}
+.history-item:hover { background: var(--border); }
+.history-expr { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--ink3); }
+.history-result { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 500; color: var(--ink); }
+.history-empty { text-align: center; color: var(--ink4); font-size: 0.78rem; padding: 20px; font-family: 'IBM Plex Mono', monospace; }
+
+/* ===== FORM ELEMENTS ===== */
+.form-group { margin-bottom: 14px; }
+.form-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink3);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.form-input, .form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--ink);
+  transition: var(--trans);
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.form-input:focus, .form-select:focus {
+  border-color: var(--ink);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(10,10,10,0.07);
+}
+.form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236A6A6A' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+.calc-action-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--ink);
+  color: var(--white);
+  border: none;
+  border-radius: var(--r-sm);
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: var(--trans);
+  margin-top: 4px;
+}
+.calc-action-btn:hover { background: #222; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.calc-action-btn:active { transform: translateY(0); }
+
+/* ===== RESULT BOX ===== */
+.result-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
+  margin-top: 14px;
+  display: none;
+  animation: fadeUp 0.3s ease both;
+}
+.result-box.show { display: block; }
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.result-row:last-child { border-bottom: none; }
+.result-label { font-size: 0.75rem; color: var(--ink3); font-family: 'Syne', sans-serif; font-weight: 500; }
+.result-val { font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; font-weight: 600; color: var(--ink); }
+.result-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: 'Syne', sans-serif;
+  letter-spacing: 0.02em;
+}
+.badge-green { background: #E6F4ED; color: var(--green); }
+.badge-yellow { background: #FEF9E7; color: #B7770D; }
+.badge-red { background: #FEF0EF; color: var(--red); }
+.badge-blue { background: #EEF3FE; color: #1E4DB7; }
+
+/* ===== CONVERTER ===== */
+.conv-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+.conv-swap-btn {
+  width: 40px; height: 40px; flex-shrink: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--trans);
+  margin-bottom: 1px;
+}
+.conv-swap-btn:hover { background: var(--ink); color: var(--white); transform: rotate(180deg); }
+
+/* ===== SECTION TITLE ===== */
+.section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink4);
+  font-family: 'IBM Plex Mono', monospace;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ===== TOAST ===== */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--ink);
+  color: var(--white);
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  z-index: 9999;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+#toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ===== MOBILE NAV ===== */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 8px 12px 16px;
+  z-index: 100;
+  gap: 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-nav::-webkit-scrollbar { display: none; }
+.mobile-nav-btn {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--ink3);
+  transition: var(--trans);
+  min-width: 56px;
+}
+.mobile-nav-btn .mn-icon { font-size: 1.1rem; }
+.mobile-nav-btn.active { color: var(--ink); background: var(--surface2); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 800px) {
+  .app-wrapper { padding: 16px 12px 80px; gap: 16px; }
+  .sidebar { display: none; }
+  .mobile-nav { display: flex; }
+  .display-value { font-size: 2rem; }
+}
+@media (max-width: 480px) {
+  .app-wrapper { padding: 12px 8px 80px; }
+  .calc-btn { height: 48px; font-size: 0.85rem; }
+  .form-row, .form-row-3 { grid-template-columns: 1fr; }
+}
+
+/* ===== SCIENTIFIC SPECIFIC ===== */
+.sci-panel .btn-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.sci-panel .calc-btn { height: 44px; font-size: 0.75rem; font-family: 'Syne', sans-serif; font-weight: 600; }
+.deg-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--ink3);
+  margin-bottom: 10px;
+}
+.toggle-switch {
+  position: relative;
+  width: 36px; height: 20px;
+}
+.toggle-switch input { display: none; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: var(--trans);
+}
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  left: 2px; top: 2px;
+  width: 16px; height: 16px;
+  background: var(--white);
+  border-radius: 50%;
+  transition: var(--trans);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.toggle-switch input:checked + .toggle-track { background: var(--ink); }
+.toggle-switch input:checked + .toggle-track::after { transform: translateX(16px); }
+
+/* ===== GRAPH ===== */
+#graphCanvas {
+  width: 100%;
+  height: 180px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  display: block;
+}
+
+/* ===== UNIT CONVERTER CATEGORIES ===== */
+.cat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.cat-pill {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: var(--surface2);
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: 'Syne', sans-serif;
+  color: var(--ink3);
+  cursor: pointer;
+  transition: var(--trans);
+}
+.cat-pill.active {
+  background: var(--ink);
+  color: var(--white);
+  border-color: var(--ink);
+}
+
+/* ===== ENGINEERING SHAPES ===== */
+.shape-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.shape-btn {
+  padding: 10px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface2);
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: 'Syne', sans-serif;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: var(--trans);
+  text-align: center;
+}
+.shape-btn:hover { border-color: var(--ink); }
+.shape-btn.active { background: var(--ink); color: var(--white); border-color: var(--ink); }
+.shape-icon { font-size: 1.3rem; display: block; margin-bottom: 3px; }
+</style>
+</head>
+<body>
+
+<div class="app-wrapper">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+          </svg>
+        </div>
+        <span class="brand-name">Raven</span>
+      </div>
+      <div class="brand-tagline">Kalkulator</div>
+    </div>
+
+    <div class="nav-label">Mode</div>
+    <ul class="nav-list">
+      <li class="nav-item fade-up fade-up-1">
+        <button class="nav-btn active" data-mode="standard" onclick="switchMode('standard')">
+          <span class="nav-icon">🔢</span> Standar
+        </button>
+      </li>
+      <li class="nav-item fade-up fade-up-2">
+        <button class="nav-btn" data-mode="scientific" onclick="switchMode('scientific')">
+          <span class="nav-icon">🔬</span> Ilmiah
+        </button>
+      </li>
+      <li class="nav-item fade-up fade-up-3">
+        <button class="nav-btn" data-mode="finance" onclick="switchMode('finance')">
+          <span class="nav-icon">💰</span> Keuangan
+        </button>
+      </li>
+      <li class="nav-item fade-up fade-up-3">
+        <button class="nav-btn" data-mode="health" onclick="switchMode('health')">
+          <span class="nav-icon">❤️</span> Kesehatan
+        </button>
+      </li>
+      <li class="nav-item fade-up fade-up-4">
+        <button class="nav-btn" data-mode="converter" onclick="switchMode('converter')">
+          <span class="nav-icon">⚖️</span> Konversi
+        </button>
+      </li>
+      <li class="nav-item fade-up fade-up-4">
+        <button class="nav-btn" data-mode="tax" onclick="switchMode('tax')">
+          <span class="nav-icon">🧾</span> Pajak
+        </button>
+      </li>
+      <li class="nav-item fade-up fade-up-5">
+        <button class="nav-btn" data-mode="engineering" onclick="switchMode('engineering')">
+          <span class="nav-icon">⚙️</span> Teknik
+        </button>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- DISPLAY -->
+    <div class="card display-card fade-up">
+      <div class="display-mode-tag" id="modeTag">MODE STANDAR</div>
+      <div class="display-history" id="displayHistory"></div>
+      <div class="display-expr" id="displayExpr"></div>
+      <div class="display-value" id="displayValue">0</div>
+      <div class="display-meta">
+        <span class="memory-badge" id="memBadge">MEM: —</span>
+        <button class="export-btn" onclick="exportResult()">↗ Ekspor</button>
+      </div>
+    </div>
+
+    <!-- ===== STANDARD MODE ===== -->
+    <div class="mode-panel active card fade-up fade-up-2" id="panel-standard">
+      <!-- Memory Row -->
+      <div class="section-title">Memori</div>
+      <div class="btn-grid btn-grid-4" style="margin-bottom:12px">
+        <button class="calc-btn sm" onclick="memOp('MC')">MC</button>
+        <button class="calc-btn sm" onclick="memOp('MR')">MR</button>
+        <button class="calc-btn sm" onclick="memOp('M+')">M+</button>
+        <button class="calc-btn sm" onclick="memOp('M-')">M−</button>
+      </div>
+      <div class="section-title">Tombol</div>
+      <div class="btn-grid btn-grid-4">
+        <button class="calc-btn sm red" onclick="clearAll()">AC</button>
+        <button class="calc-btn sm op" onclick="delChar()">⌫</button>
+        <button class="calc-btn sm op" onclick="inputOp('%')">%</button>
+        <button class="calc-btn sm op" onclick="inputOp('÷')">÷</button>
+
+        <button class="calc-btn" onclick="inputNum('7')">7</button>
+        <button class="calc-btn" onclick="inputNum('8')">8</button>
+        <button class="calc-btn" onclick="inputNum('9')">9</button>
+        <button class="calc-btn op" onclick="inputOp('×')">×</button>
+
+        <button class="calc-btn" onclick="inputNum('4')">4</button>
+        <button class="calc-btn" onclick="inputNum('5')">5</button>
+        <button class="calc-btn" onclick="inputNum('6')">6</button>
+        <button class="calc-btn op" onclick="inputOp('−')">−</button>
+
+        <button class="calc-btn" onclick="inputNum('1')">1</button>
+        <button class="calc-btn" onclick="inputNum('2')">2</button>
+        <button class="calc-btn" onclick="inputNum('3')">3</button>
+        <button class="calc-btn op" onclick="inputOp('+')">+</button>
+
+        <button class="calc-btn" onclick="toggleSign()">+/−</button>
+        <button class="calc-btn" onclick="inputNum('0')">0</button>
+        <button class="calc-btn" onclick="inputDot()">.</button>
+        <button class="calc-btn dark eq" onclick="calculate()">=</button>
+      </div>
+
+      <!-- History -->
+      <div class="section-title" style="margin-top:16px">Riwayat</div>
+      <div class="history-panel" id="historyPanel">
+        <div class="history-empty">Belum ada riwayat perhitungan</div>
+      </div>
+    </div>
+
+    <!-- ===== SCIENTIFIC MODE ===== -->
+    <div class="mode-panel card fade-up" id="panel-scientific">
+      <div class="deg-toggle">
+        <span>DEG</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="radToggle" onchange="toggleAngleMode()">
+          <span class="toggle-track"></span>
+        </label>
+        <span>RAD</span>
+      </div>
+      <div class="sci-panel">
+        <div class="btn-grid" style="margin-bottom:8px">
+          <button class="calc-btn xs" onclick="sciFunc('sin')">sin</button>
+          <button class="calc-btn xs" onclick="sciFunc('cos')">cos</button>
+          <button class="calc-btn xs" onclick="sciFunc('tan')">tan</button>
+          <button class="calc-btn xs" onclick="sciFunc('asin')">sin⁻¹</button>
+          <button class="calc-btn xs" onclick="sciFunc('acos')">cos⁻¹</button>
+
+          <button class="calc-btn xs" onclick="sciFunc('atan')">tan⁻¹</button>
+          <button class="calc-btn xs" onclick="sciFunc('log')">log</button>
+          <button class="calc-btn xs" onclick="sciFunc('ln')">ln</button>
+          <button class="calc-btn xs" onclick="sciFunc('log2')">log₂</button>
+          <button class="calc-btn xs" onclick="sciFunc('sqrt')">√x</button>
+
+          <button class="calc-btn xs" onclick="sciFunc('sq')">x²</button>
+          <button class="calc-btn xs" onclick="sciFunc('cube')">x³</button>
+          <button class="calc-btn xs" onclick="sciFunc('pow')">xⁿ</button>
+          <button class="calc-btn xs" onclick="sciFunc('nrt')">ⁿ√x</button>
+          <button class="calc-btn xs" onclick="sciFunc('fact')">n!</button>
+
+          <button class="calc-btn xs dark" onclick="inputConst('pi')">π</button>
+          <button class="calc-btn xs dark" onclick="inputConst('e')">e</button>
+          <button class="calc-btn xs" onclick="sciFunc('inv')">1/x</button>
+          <button class="calc-btn xs" onclick="sciFunc('abs')">|x|</button>
+          <button class="calc-btn xs" onclick="sciFunc('exp')">eˣ</button>
+        </div>
+      </div>
+
+      <!-- Standard buttons compact for sci mode -->
+      <div class="btn-grid btn-grid-4">
+        <button class="calc-btn sm red" onclick="clearAll()">AC</button>
+        <button class="calc-btn sm op" onclick="delChar()">⌫</button>
+        <button class="calc-btn sm op" onclick="inputOp('%')">%</button>
+        <button class="calc-btn sm op" onclick="inputOp('÷')">÷</button>
+
+        <button class="calc-btn" onclick="inputNum('7')">7</button>
+        <button class="calc-btn" onclick="inputNum('8')">8</button>
+        <button class="calc-btn" onclick="inputNum('9')">9</button>
+        <button class="calc-btn op" onclick="inputOp('×')">×</button>
+
+        <button class="calc-btn" onclick="inputNum('4')">4</button>
+        <button class="calc-btn" onclick="inputNum('5')">5</button>
+        <button class="calc-btn" onclick="inputNum('6')">6</button>
+        <button class="calc-btn op" onclick="inputOp('−')">−</button>
+
+        <button class="calc-btn" onclick="inputNum('1')">1</button>
+        <button class="calc-btn" onclick="inputNum('2')">2</button>
+        <button class="calc-btn" onclick="inputNum('3')">3</button>
+        <button class="calc-btn op" onclick="inputOp('+')">+</button>
+
+        <button class="calc-btn" onclick="toggleSign()">+/−</button>
+        <button class="calc-btn" onclick="inputNum('0')">0</button>
+        <button class="calc-btn" onclick="inputDot()">.</button>
+        <button class="calc-btn dark eq" onclick="calculate()">=</button>
+      </div>
+
+      <!-- Graph -->
+      <div class="section-title" style="margin-top:16px">Grafik Fungsi</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input type="text" class="form-input" id="graphFunc" placeholder="cth: sin(x), x^2, ln(x)" style="flex:1">
+        <button class="calc-action-btn" style="width:auto;padding:10px 16px;margin-top:0" onclick="drawGraph()">Plot</button>
+      </div>
+      <canvas id="graphCanvas"></canvas>
+    </div>
+
+    <!-- ===== FINANCE MODE ===== -->
+    <div class="mode-panel card fade-up" id="panel-finance">
+      <div class="tab-bar" style="margin-bottom:16px">
+        <button class="tab-btn active" onclick="finTab(this,'fin-cicil')">Cicilan</button>
+        <button class="tab-btn" onclick="finTab(this,'fin-compound')">Majemuk</button>
+        <button class="tab-btn" onclick="finTab(this,'fin-invest')">Investasi</button>
+        <button class="tab-btn" onclick="finTab(this,'fin-roi')">ROI</button>
+      </div>
+
+      <!-- Cicilan -->
+      <div id="fin-cicil" class="fin-panel">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Pokok Pinjaman (Rp)</label>
+            <input type="number" class="form-input" id="f_pokok" placeholder="500000000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bunga / Tahun (%)</label>
+            <input type="number" class="form-input" id="f_bunga" placeholder="9">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tenor (Bulan)</label>
+          <input type="number" class="form-input" id="f_tenor" placeholder="120">
+        </div>
+        <button class="calc-action-btn" onclick="calcCicilan()">Hitung Angsuran</button>
+        <div class="result-box" id="res-cicil"></div>
+      </div>
+
+      <!-- Compound -->
+      <div id="fin-compound" class="fin-panel" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Modal Awal (Rp)</label>
+            <input type="number" class="form-input" id="c_modal" placeholder="10000000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bunga / Tahun (%)</label>
+            <input type="number" class="form-input" id="c_rate" placeholder="8">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Frekuensi/Tahun</label>
+            <select class="form-select" id="c_freq">
+              <option value="1">Tahunan</option>
+              <option value="2">Semester</option>
+              <option value="4">Triwulan</option>
+              <option value="12" selected>Bulanan</option>
+              <option value="365">Harian</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Durasi (Tahun)</label>
+            <input type="number" class="form-input" id="c_tahun" placeholder="10">
+          </div>
+        </div>
+        <button class="calc-action-btn" onclick="calcCompound()">Hitung</button>
+        <div class="result-box" id="res-compound"></div>
+      </div>
+
+      <!-- Investasi -->
+      <div id="fin-invest" class="fin-panel" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tabungan Bulanan (Rp)</label>
+            <input type="number" class="form-input" id="i_bulanan" placeholder="1000000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Return / Tahun (%)</label>
+            <input type="number" class="form-input" id="i_return" placeholder="12">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Durasi (Tahun)</label>
+          <input type="number" class="form-input" id="i_tahun" placeholder="20">
+        </div>
+        <button class="calc-action-btn" onclick="calcInvestasi()">Hitung Future Value</button>
+        <div class="result-box" id="res-invest"></div>
+      </div>
+
+      <!-- ROI -->
+      <div id="fin-roi" class="fin-panel" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Modal Awal (Rp)</label>
+            <input type="number" class="form-input" id="r_modal" placeholder="5000000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nilai Akhir (Rp)</label>
+            <input type="number" class="form-input" id="r_akhir" placeholder="8000000">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Durasi (Tahun, opsional)</label>
+          <input type="number" class="form-input" id="r_tahun" placeholder="3">
+        </div>
+        <button class="calc-action-btn" onclick="calcROI()">Hitung ROI</button>
+        <div class="result-box" id="res-roi"></div>
+      </div>
+    </div>
+
+    <!-- ===== HEALTH MODE ===== -->
+    <div class="mode-panel card fade-up" id="panel-health">
+      <div class="tab-bar" style="margin-bottom:16px">
+        <button class="tab-btn active" onclick="healthTab(this,'h-bmi')">BMI</button>
+        <button class="tab-btn" onclick="healthTab(this,'h-bmr')">Kalori BMR</button>
+        <button class="tab-btn" onclick="healthTab(this,'h-ideal')">Berat Ideal</button>
+      </div>
+
+      <!-- BMI -->
+      <div id="h-bmi">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Berat (kg)</label>
+            <input type="number" class="form-input" id="bmi_berat" placeholder="65">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tinggi (cm)</label>
+            <input type="number" class="form-input" id="bmi_tinggi" placeholder="170">
+          </div>
+        </div>
+        <button class="calc-action-btn" onclick="calcBMI()">Hitung BMI</button>
+        <div class="result-box" id="res-bmi"></div>
+      </div>
+
+      <!-- BMR -->
+      <div id="h-bmr" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Berat (kg)</label>
+            <input type="number" class="form-input" id="bmr_berat" placeholder="65">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tinggi (cm)</label>
+            <input type="number" class="form-input" id="bmr_tinggi" placeholder="170">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Usia (tahun)</label>
+            <input type="number" class="form-input" id="bmr_usia" placeholder="25">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jenis Kelamin</label>
+            <select class="form-select" id="bmr_sex">
+              <option value="L">Laki-laki</option>
+              <option value="P">Perempuan</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tingkat Aktivitas</label>
+          <select class="form-select" id="bmr_act">
+            <option value="1.2">Sedentary (tidak aktif)</option>
+            <option value="1.375">Ringan (olahraga 1-3x/minggu)</option>
+            <option value="1.55" selected>Moderat (olahraga 3-5x/minggu)</option>
+            <option value="1.725">Aktif (olahraga 6-7x/minggu)</option>
+            <option value="1.9">Sangat Aktif (2x sehari)</option>
+          </select>
+        </div>
+        <button class="calc-action-btn" onclick="calcBMR()">Hitung Kebutuhan Kalori</button>
+        <div class="result-box" id="res-bmr"></div>
+      </div>
+
+      <!-- Ideal Weight -->
+      <div id="h-ideal" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tinggi (cm)</label>
+            <input type="number" class="form-input" id="iw_tinggi" placeholder="170">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jenis Kelamin</label>
+            <select class="form-select" id="iw_sex">
+              <option value="L">Laki-laki</option>
+              <option value="P">Perempuan</option>
+            </select>
+          </div>
+        </div>
+        <button class="calc-action-btn" onclick="calcIdealWeight()">Hitung</button>
+        <div class="result-box" id="res-ideal"></div>
+      </div>
+    </div>
+
+    <!-- ===== CONVERTER MODE ===== -->
+    <div class="mode-panel card fade-up" id="panel-converter">
+      <div class="cat-pills" id="catPills"></div>
+      <div class="conv-row">
+        <div style="flex:1">
+          <label class="form-label" id="fromLabel">Dari</label>
+          <select class="form-select" id="convFromUnit" onchange="convertUnits()"></select>
+        </div>
+        <button class="conv-swap-btn" onclick="swapUnits()">⇄</button>
+        <div style="flex:1">
+          <label class="form-label" id="toLabel">Ke</label>
+          <select class="form-select" id="convToUnit" onchange="convertUnits()"></select>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:12px">
+        <div class="form-group">
+          <label class="form-label">Nilai</label>
+          <input type="number" class="form-input" id="convInput" placeholder="1" oninput="convertUnits()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hasil</label>
+          <input type="text" class="form-input" id="convOutput" readonly placeholder="—" style="background:var(--surface2)">
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAX MODE ===== -->
+    <div class="mode-panel card fade-up" id="panel-tax">
+      <div class="tab-bar" style="margin-bottom:16px">
+        <button class="tab-btn active" onclick="taxTab(this,'t-pph')">PPh 21</button>
+        <button class="tab-btn" onclick="taxTab(this,'t-ppn')">PPN</button>
+        <button class="tab-btn" onclick="taxTab(this,'t-diskon')">Diskon + Pajak</button>
+      </div>
+
+      <!-- PPh 21 -->
+      <div id="t-pph">
+        <div class="form-group">
+          <label class="form-label">Gaji Bruto / Bulan (Rp)</label>
+          <input type="number" class="form-input" id="pph_gaji" placeholder="10000000">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Status PTKP</label>
+            <select class="form-select" id="pph_status">
+              <option value="54000000">TK/0 – Rp 54.000.000</option>
+              <option value="58500000">K/0 – Rp 58.500.000</option>
+              <option value="63000000">K/1 – Rp 63.000.000</option>
+              <option value="67500000">K/2 – Rp 67.500.000</option>
+              <option value="72000000">K/3 – Rp 72.000.000</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tunjangan / Bulan (Rp)</label>
+            <input type="number" class="form-input" id="pph_tunjangan" placeholder="0">
+          </div>
+        </div>
+        <button class="calc-action-btn" onclick="calcPPh()">Hitung PPh 21</button>
+        <div class="result-box" id="res-pph"></div>
+      </div>
+
+      <!-- PPN -->
+      <div id="t-ppn" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Harga Dasar (Rp)</label>
+            <input type="number" class="form-input" id="ppn_harga" placeholder="1000000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tarif PPN (%)</label>
+            <input type="number" class="form-input" id="ppn_rate" placeholder="11" value="11">
+          </div>
+        </div>
+        <button class="calc-action-btn" onclick="calcPPN()">Hitung PPN</button>
+        <div class="result-box" id="res-ppn"></div>
+      </div>
+
+      <!-- Diskon + Pajak -->
+      <div id="t-diskon" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Harga Asli (Rp)</label>
+          <input type="number" class="form-input" id="dk_harga" placeholder="500000">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Diskon (%)</label>
+            <input type="number" class="form-input" id="dk_diskon" placeholder="20">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pajak (%)</label>
+            <input type="number" class="form-input" id="dk_pajak" placeholder="11">
+          </div>
+        </div>
+        <button class="calc-action-btn" onclick="calcDiskon()">Hitung</button>
+        <div class="result-box" id="res-diskon"></div>
+      </div>
+    </div>
+
+    <!-- ===== ENGINEERING MODE ===== -->
+    <div class="mode-panel card fade-up" id="panel-engineering">
+      <div class="tab-bar" style="margin-bottom:16px">
+        <button class="tab-btn active" onclick="engTab(this,'e-ohm')">Ohm</button>
+        <button class="tab-btn" onclick="engTab(this,'e-shape')">Bangun Datar</button>
+        <button class="tab-btn" onclick="engTab(this,'e-volume')">Bangun Ruang</button>
+        <button class="tab-btn" onclick="engTab(this,'e-motion')">Gerak</button>
+      </div>
+
+      <!-- Ohm's Law -->
+      <div id="e-ohm">
+        <p style="font-size:0.75rem;color:var(--ink3);margin-bottom:12px;font-family:'IBM Plex Mono',monospace">Isi 2 dari 3 nilai. Kosongkan yang ingin dicari.</p>
+        <div class="form-row-3">
+          <div class="form-group">
+            <label class="form-label">Tegangan V (Volt)</label>
+            <input type="number" class="form-input" id="ohm_v" placeholder="?">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Arus I (Ampere)</label>
+            <input type="number" class="form-input" id="ohm_i" placeholder="?">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hambatan R (Ohm)</label>
+            <input type="number" class="form-input" id="ohm_r" placeholder="?">
+          </div>
+        </div>
+        <button class="calc-action-btn" onclick="calcOhm()">Hitung</button>
+        <div class="result-box" id="res-ohm"></div>
+        <div style="margin-top:14px">
+          <div class="section-title">Daya Listrik</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tegangan V (Volt)</label>
+              <input type="number" class="form-input" id="pw_v" placeholder="220">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Arus I (Ampere)</label>
+              <input type="number" class="form-input" id="pw_i" placeholder="5">
+            </div>
+          </div>
+          <button class="calc-action-btn" onclick="calcPower()">Hitung Daya</button>
+          <div class="result-box" id="res-power"></div>
+        </div>
+      </div>
+
+      <!-- Bangun Datar -->
+      <div id="e-shape" style="display:none">
+        <div class="shape-grid" id="shapeGrid">
+          <button class="shape-btn active" onclick="selectShape(this,'lingkaran')"><span class="shape-icon">⭕</span>Lingkaran</button>
+          <button class="shape-btn" onclick="selectShape(this,'segitiga')"><span class="shape-icon">△</span>Segitiga</button>
+          <button class="shape-btn" onclick="selectShape(this,'persegi')"><span class="shape-icon">⬜</span>Persegi</button>
+          <button class="shape-btn" onclick="selectShape(this,'persegipanjang')"><span class="shape-icon">▭</span>Persegi Panjang</button>
+          <button class="shape-btn" onclick="selectShape(this,'trapesium')"><span class="shape-icon">⏢</span>Trapesium</button>
+          <button class="shape-btn" onclick="selectShape(this,'jajarGenjang')"><span class="shape-icon">⬡</span>Jajar Genjang</button>
+        </div>
+        <div id="shapeInputs"></div>
+        <button class="calc-action-btn" onclick="calcShape()">Hitung</button>
+        <div class="result-box" id="res-shape"></div>
+      </div>
+
+      <!-- Bangun Ruang -->
+      <div id="e-volume" style="display:none">
+        <div class="shape-grid" id="volumeGrid">
+          <button class="shape-btn active" onclick="selectVolume(this,'kubus')"><span class="shape-icon">🟫</span>Kubus</button>
+          <button class="shape-btn" onclick="selectVolume(this,'balok')"><span class="shape-icon">📦</span>Balok</button>
+          <button class="shape-btn" onclick="selectVolume(this,'tabung')"><span class="shape-icon">🥫</span>Tabung</button>
+          <button class="shape-btn" onclick="selectVolume(this,'bola')"><span class="shape-icon">⚽</span>Bola</button>
+          <button class="shape-btn" onclick="selectVolume(this,'kerucut')"><span class="shape-icon">🔺</span>Kerucut</button>
+          <button class="shape-btn" onclick="selectVolume(this,'limas')"><span class="shape-icon">🔷</span>Limas</button>
+        </div>
+        <div id="volumeInputs"></div>
+        <button class="calc-action-btn" onclick="calcVolume()">Hitung</button>
+        <div class="result-box" id="res-volume"></div>
+      </div>
+
+      <!-- Gerak -->
+      <div id="e-motion" style="display:none">
+        <p style="font-size:0.75rem;color:var(--ink3);margin-bottom:12px;font-family:'IBM Plex Mono',monospace">Isi 2 dari 3. Kosongkan yang ingin dicari. (v = s ÷ t)</p>
+        <div class="form-row-3">
+          <div class="form-group">
+            <label class="form-label">Kecepatan v (m/s)</label>
+            <input type="number" class="form-input" id="mo_v" placeholder="?">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jarak s (meter)</label>
+            <input type="number" class="form-input" id="mo_s" placeholder="?">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Waktu t (detik)</label>
+            <input type="number" class="form-input" id="mo_t" placeholder="?">
+          </div>
+        </div>
+        <button class="calc-action-btn" onclick="calcMotion()">Hitung</button>
+        <div class="result-box" id="res-motion"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-btn active" data-mode="standard" onclick="switchMode('standard')"><span class="mn-icon">🔢</span>Standar</button>
+  <button class="mobile-nav-btn" data-mode="scientific" onclick="switchMode('scientific')"><span class="mn-icon">🔬</span>Ilmiah</button>
+  <button class="mobile-nav-btn" data-mode="finance" onclick="switchMode('finance')"><span class="mn-icon">💰</span>Keuangan</button>
+  <button class="mobile-nav-btn" data-mode="health" onclick="switchMode('health')"><span class="mn-icon">❤️</span>Kesehatan</button>
+  <button class="mobile-nav-btn" data-mode="converter" onclick="switchMode('converter')"><span class="mn-icon">⚖️</span>Konversi</button>
+  <button class="mobile-nav-btn" data-mode="tax" onclick="switchMode('tax')"><span class="mn-icon">🧾</span>Pajak</button>
+  <button class="mobile-nav-btn" data-mode="engineering" onclick="switchMode('engineering')"><span class="mn-icon">⚙️</span>Teknik</button>
+</nav>
+
+<div id="toast"></div>
+
+<script>
+// ===== STATE =====
+let currentMode = 'standard';
+let displayVal = '0';
+let expression = '';
+let prevVal = null;
+let operator = null;
+let waitingOperand = false;
+let memory = null;
+let history = [];
+let angleMode = 'deg'; // deg or rad
+let currentShape = 'lingkaran';
+let currentVolume = 'kubus';
+
+const modes = ['standard','scientific','finance','health','converter','tax','engineering'];
+const modeTags = { standard:'MODE STANDAR', scientific:'MODE ILMIAH', finance:'MODE KEUANGAN', health:'MODE KESEHATAN', converter:'MODE KONVERSI', tax:'MODE PAJAK', engineering:'MODE TEKNIK' };
+
+// ===== DISPLAY =====
+function updateDisplay(val, expr='', hist='') {
+  const el = document.getElementById('displayValue');
+  el.style.animation = 'none';
+  el.offsetHeight; // reflow
+  el.style.animation = 'numFlip 0.18s ease both';
+  
+  let s = String(val);
+  if (s.length > 14) s = parseFloat(val).toExponential(6);
+  el.textContent = s;
+  document.getElementById('displayExpr').textContent = expr;
+  document.getElementById('displayHistory').textContent = hist;
+  
+  const memBadge = document.getElementById('memBadge');
+  if (memory !== null) {
+    memBadge.textContent = 'MEM: ' + fmtNum(memory);
+    memBadge.classList.add('active');
+  } else {
+    memBadge.textContent = 'MEM: —';
+    memBadge.classList.remove('active');
+  }
+}
+
+function fmtNum(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  if (Math.abs(n) > 1e12) return n.toExponential(4);
+  return parseFloat(n.toFixed(10)).toString();
+}
+function fmtRp(n) {
+  return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+
+// ===== MODE SWITCH =====
+function switchMode(mode) {
+  currentMode = mode;
+  modes.forEach(m => {
+    document.getElementById('panel-' + m).classList.toggle('active', m === mode);
+  });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  document.getElementById('modeTag').textContent = modeTags[mode];
+  
+  if (mode === 'converter') initConverter();
+  if (mode === 'engineering') { initShapeInputs(); initVolumeInputs(); }
+}
+
+// ===== CALC BUTTONS =====
+function addRipple(e) {
+  const btn = e.currentTarget;
+  const r = document.createElement('span');
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;`;
+  r.className = 'ripple-el';
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 450);
+}
+
+document.querySelectorAll('.calc-btn').forEach(btn => {
+  btn.addEventListener('click', addRipple);
+});
+
+function inputNum(n) {
+  if (waitingOperand) { displayVal = n; waitingOperand = false; }
+  else { displayVal = displayVal === '0' ? n : displayVal + n; }
+  if (displayVal.length > 16) return;
+  updateDisplay(displayVal, expression);
+}
+
+function inputDot() {
+  if (waitingOperand) { displayVal = '0.'; waitingOperand = false; }
+  else if (!displayVal.includes('.')) displayVal += '.';
+  updateDisplay(displayVal, expression);
+}
+
+function inputOp(op) {
+  const val = parseFloat(displayVal);
+  if (prevVal !== null && !waitingOperand) {
+    const result = compute(prevVal, val, operator);
+    displayVal = fmtNum(result);
+    prevVal = result;
+  } else {
+    prevVal = val;
+  }
+  operator = op;
+  waitingOperand = true;
+  expression = fmtNum(prevVal) + ' ' + op;
+  updateDisplay(displayVal, expression);
+}
+
+function compute(a, b, op) {
+  switch(op) {
+    case '+': return a + b;
+    case '−': return a - b;
+    case '×': return a * b;
+    case '÷': return b === 0 ? NaN : a / b;
+    case '%': return (a * b) / 100;
+  }
+}
+
+function calculate() {
+  if (prevVal === null || operator === null) {
+    if (displayVal === '0') return;
+    addHistory(displayVal + ' =', displayVal);
+    return;
+  }
+  const val = parseFloat(displayVal);
+  const expr = expression + ' ' + displayVal + ' =';
+  const result = compute(prevVal, val, operator);
+  const resultStr = fmtNum(result);
+  addHistory(expr, resultStr);
+  displayVal = resultStr;
+  prevVal = null; operator = null; waitingOperand = false;
+  expression = '';
+  updateDisplay(displayVal, '', expr);
+}
+
+function clearAll() {
+  displayVal = '0'; expression = ''; prevVal = null; operator = null; waitingOperand = false;
+  updateDisplay('0');
+}
+
+function delChar() {
+  if (waitingOperand || displayVal === '0') return;
+  displayVal = displayVal.length > 1 ? displayVal.slice(0,-1) : '0';
+  updateDisplay(displayVal, expression);
+}
+
+function toggleSign() {
+  displayVal = String(-parseFloat(displayVal));
+  updateDisplay(displayVal, expression);
+}
+
+// ===== MEMORY =====
+function memOp(op) {
+  const val = parseFloat(displayVal);
+  switch(op) {
+    case 'MC': memory = null; break;
+    case 'MR': if (memory !== null) { displayVal = fmtNum(memory); waitingOperand = false; } break;
+    case 'M+': memory = (memory || 0) + val; break;
+    case 'M-': memory = (memory || 0) - val; break;
+  }
+  updateDisplay(displayVal, expression);
+  showToast(op + ' ' + (memory !== null ? fmtNum(memory) : '—'));
+}
+
+// ===== HISTORY =====
+function addHistory(expr, result) {
+  history.unshift({ expr, result });
+  if (history.length > 50) history.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById('historyPanel');
+  if (!history.length) { el.innerHTML = '<div class="history-empty">Belum ada riwayat perhitungan</div>'; return; }
+  el.innerHTML = history.slice(0,20).map((h,i) => `
+    <div class="history-item" onclick="useHistory(${i})">
+      <span class="history-expr">${h.expr}</span>
+      <span class="history-result">${h.result}</span>
+    </div>`).join('');
+}
+
+function useHistory(i) {
+  displayVal = history[i].result;
+  waitingOperand = false;
+  updateDisplay(displayVal);
+}
+
+// ===== SCIENTIFIC =====
+function toggleAngleMode() {
+  angleMode = document.getElementById('radToggle').checked ? 'rad' : 'deg';
+}
+
+function toRad(v) { return angleMode === 'deg' ? v * Math.PI / 180 : v; }
+function fromRad(v) { return angleMode === 'deg' ? v * 180 / Math.PI : v; }
+
+function sciFunc(fn) {
+  let val = parseFloat(displayVal);
+  let result;
+  switch(fn) {
+    case 'sin': result = Math.sin(toRad(val)); break;
+    case 'cos': result = Math.cos(toRad(val)); break;
+    case 'tan': result = Math.tan(toRad(val)); break;
+    case 'asin': result = fromRad(Math.asin(val)); break;
+    case 'acos': result = fromRad(Math.acos(val)); break;
+    case 'atan': result = fromRad(Math.atan(val)); break;
+    case 'log': result = Math.log10(val); break;
+    case 'ln': result = Math.log(val); break;
+    case 'log2': result = Math.log2(val); break;
+    case 'sqrt': result = Math.sqrt(val); break;
+    case 'sq': result = val * val; break;
+    case 'cube': result = val * val * val; break;
+    case 'pow': {
+      const n = parseFloat(prompt('Masukkan pangkat (n):'));
+      result = Math.pow(val, n); break;
+    }
+    case 'nrt': {
+      const n = parseFloat(prompt('Masukkan akar ke-n:'));
+      result = Math.pow(val, 1/n); break;
+    }
+    case 'fact': {
+      let r = 1; for(let i=2;i<=Math.round(val);i++) r*=i;
+      result = r; break;
+    }
+    case 'inv': result = 1 / val; break;
+    case 'abs': result = Math.abs(val); break;
+    case 'exp': result = Math.exp(val); break;
+    default: result = val;
+  }
+  const expr = `${fn}(${val})`;
+  addHistory(expr + ' =', fmtNum(result));
+  displayVal = fmtNum(result);
+  waitingOperand = true;
+  updateDisplay(displayVal, '', expr + ' =');
+}
+
+function inputConst(c) {
+  const val = c === 'pi' ? Math.PI : Math.E;
+  displayVal = fmtNum(val);
+  waitingOperand = false;
+  updateDisplay(displayVal, expression);
+}
+
+// ===== GRAPH =====
+function drawGraph() {
+  const fnStr = document.getElementById('graphFunc').value.trim();
+  if (!fnStr) return;
+  const canvas = document.getElementById('graphCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = 180;
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#F2F2F0';
+  ctx.fillRect(0,0,W,H);
+
+  const range = 10;
+  const toX = x => (x + range) / (2 * range) * W;
+  const toY = y => H/2 - y / range * (H/2);
+
+  // Grid
+  ctx.strokeStyle = '#E0E0DC'; ctx.lineWidth = 1;
+  for(let i=-range;i<=range;i++) {
+    const x = toX(i); ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+    const y = toY(i); ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = '#3A3A3A'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke();
+
+  // Function
+  let fn;
+  try {
+    let expr = fnStr.replace(/\^/g,'**').replace(/sin/g,'Math.sin').replace(/cos/g,'Math.cos').replace(/tan/g,'Math.tan').replace(/sqrt/g,'Math.sqrt').replace(/log/g,'Math.log10').replace(/ln/g,'Math.log').replace(/abs/g,'Math.abs').replace(/pi/g,'Math.PI').replace(/e(?![0-9])/g,'Math.E');
+    fn = new Function('x', 'return ' + expr);
+  } catch(e) { showToast('Fungsi tidak valid'); return; }
+
+  ctx.strokeStyle = '#0A0A0A'; ctx.lineWidth = 2; ctx.beginPath();
+  let started = false;
+  for(let px=0;px<W;px++) {
+    const x = (px / W) * 2 * range - range;
+    let y;
+    try { y = fn(x); } catch(e) { started=false; continue; }
+    if (!isFinite(y) || Math.abs(y) > range * 3) { started=false; continue; }
+    const sx = px, sy = toY(y);
+    if (!started) { ctx.moveTo(sx, sy); started = true; } else ctx.lineTo(sx, sy);
+  }
+  ctx.stroke();
+  showToast('Grafik diperbarui');
+}
+
+// ===== FINANCE =====
+function finTab(btn, id) {
+  document.querySelectorAll('#panel-finance .tab-btn').forEach(b => b.classList.toggle('active', b===btn));
+  document.querySelectorAll('#panel-finance .fin-panel').forEach(p => p.style.display='none');
+  document.getElementById(id).style.display='block';
+}
+
+function showResult(id, rows) {
+  const el = document.getElementById(id);
+  el.classList.add('show');
+  el.innerHTML = rows.map(r => `<div class="result-row"><span class="result-label">${r.label}</span><span class="result-val">${r.val}</span></div>`).join('');
+}
+
+function calcCicilan() {
+  const P = parseFloat(document.getElementById('f_pokok').value);
+  const r = parseFloat(document.getElementById('f_bunga').value) / 100 / 12;
+  const n = parseInt(document.getElementById('f_tenor').value);
+  if (!P||!r||!n) { showToast('Lengkapi semua field'); return; }
+  const angsuran = P * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1);
+  const totalBayar = angsuran * n;
+  const totalBunga = totalBayar - P;
+  showResult('res-cicil',[
+    {label:'Angsuran / Bulan', val: fmtRp(angsuran)},
+    {label:'Total Pembayaran', val: fmtRp(totalBayar)},
+    {label:'Total Bunga', val: fmtRp(totalBunga)},
+    {label:'Rasio Bunga', val: (totalBunga/P*100).toFixed(1)+'%'}
+  ]);
+}
+
+function calcCompound() {
+  const P = parseFloat(document.getElementById('c_modal').value);
+  const r = parseFloat(document.getElementById('c_rate').value) / 100;
+  const n = parseInt(document.getElementById('c_freq').value);
+  const t = parseFloat(document.getElementById('c_tahun').value);
+  if (!P||!r||!n||!t) { showToast('Lengkapi semua field'); return; }
+  const A = P * Math.pow(1 + r/n, n*t);
+  showResult('res-compound',[
+    {label:'Modal Awal', val: fmtRp(P)},
+    {label:'Nilai Akhir', val: fmtRp(A)},
+    {label:'Total Keuntungan', val: fmtRp(A-P)},
+    {label:'Return Total', val: ((A-P)/P*100).toFixed(2)+'%'}
+  ]);
+}
+
+function calcInvestasi() {
+  const PMT = parseFloat(document.getElementById('i_bulanan').value);
+  const r = parseFloat(document.getElementById('i_return').value) / 100 / 12;
+  const n = parseInt(document.getElementById('i_tahun').value) * 12;
+  if (!PMT||!r||!n) { showToast('Lengkapi semua field'); return; }
+  const FV = PMT * (Math.pow(1+r,n)-1) / r;
+  const totalSetor = PMT * n;
+  showResult('res-invest',[
+    {label:'Future Value', val: fmtRp(FV)},
+    {label:'Total Setoran', val: fmtRp(totalSetor)},
+    {label:'Keuntungan Investasi', val: fmtRp(FV-totalSetor)},
+    {label:'Pertumbuhan', val: ((FV/totalSetor-1)*100).toFixed(1)+'%'}
+  ]);
+}
+
+function calcROI() {
+  const modal = parseFloat(document.getElementById('r_modal').value);
+  const akhir = parseFloat(document.getElementById('r_akhir').value);
+  const tahun = parseFloat(document.getElementById('r_tahun').value) || 0;
+  if (!modal||!akhir) { showToast('Lengkapi field wajib'); return; }
+  const roi = (akhir - modal) / modal * 100;
+  const rows = [
+    {label:'ROI Total', val: roi.toFixed(2)+'%'},
+    {label:'Keuntungan', val: fmtRp(akhir-modal)}
+  ];
+  if (tahun) {
+    const cagr = (Math.pow(akhir/modal, 1/tahun)-1)*100;
+    rows.push({label:'CAGR (per tahun)', val: cagr.toFixed(2)+'%'});
+  }
+  showResult('res-roi', rows);
+}
+
+// ===== HEALTH =====
+function healthTab(btn, id) {
+  document.querySelectorAll('#panel-health .tab-btn').forEach(b => b.classList.toggle('active', b===btn));
+  ['h-bmi','h-bmr','h-ideal'].forEach(p => { document.getElementById(p).style.display='none'; });
+  document.getElementById(id).style.display='block';
+}
+
+function getBMICategory(bmi) {
+  if (bmi < 17) return {text:'Sangat Kurus', cls:'badge-red'};
+  if (bmi < 18.5) return {text:'Kurus', cls:'badge-yellow'};
+  if (bmi < 25) return {text:'Normal', cls:'badge-green'};
+  if (bmi < 30) return {text:'Overweight', cls:'badge-yellow'};
+  return {text:'Obesitas', cls:'badge-red'};
+}
+
+function calcBMI() {
+  const w = parseFloat(document.getElementById('bmi_berat').value);
+  const h = parseFloat(document.getElementById('bmi_tinggi').value) / 100;
+  if (!w||!h) { showToast('Lengkapi semua field'); return; }
+  const bmi = w / (h*h);
+  const cat = getBMICategory(bmi);
+  const el = document.getElementById('res-bmi');
+  el.classList.add('show');
+  el.innerHTML = `
+    <div class="result-row"><span class="result-label">Nilai BMI</span><span class="result-val">${bmi.toFixed(2)}</span></div>
+    <div class="result-row"><span class="result-label">Kategori</span><span class="result-val"><span class="result-badge ${cat.cls}">${cat.text}</span></span></div>
+    <div class="result-row"><span class="result-label">Rentang Normal</span><span class="result-val">18.5 – 24.9</span></div>
+  `;
+}
+
+function calcBMR() {
+  const w = parseFloat(document.getElementById('bmr_berat').value);
+  const h = parseFloat(document.getElementById('bmr_tinggi').value);
+  const a = parseFloat(document.getElementById('bmr_usia').value);
+  const sex = document.getElementById('bmr_sex').value;
+  const act = parseFloat(document.getElementById('bmr_act').value);
+  if (!w||!h||!a) { showToast('Lengkapi semua field'); return; }
+  // Mifflin-St Jeor
+  let bmr = sex === 'L' ? (10*w + 6.25*h - 5*a + 5) : (10*w + 6.25*h - 5*a - 161);
+  const tdee = bmr * act;
+  showResult('res-bmr',[
+    {label:'BMR (kebutuhan dasar)', val: Math.round(bmr) + ' kkal'},
+    {label:'TDEE (total harian)', val: Math.round(tdee) + ' kkal'},
+    {label:'Turun berat badan', val: Math.round(tdee - 500) + ' kkal'},
+    {label:'Naik berat badan', val: Math.round(tdee + 500) + ' kkal'}
+  ]);
+}
+
+function calcIdealWeight() {
+  const h = parseFloat(document.getElementById('iw_tinggi').value);
+  const sex = document.getElementById('iw_sex').value;
+  if (!h) { showToast('Masukkan tinggi badan'); return; }
+  // Broca
+  const broca = sex === 'L' ? (h - 100) - 0.1*(h-100) : (h - 100) - 0.15*(h-100);
+  // Devine
+  const devine = sex === 'L' ? 50 + 2.3 * ((h/2.54) - 60) : 45.5 + 2.3 * ((h/2.54) - 60);
+  const bmiLow = 18.5 * Math.pow(h/100, 2);
+  const bmiHigh = 24.9 * Math.pow(h/100, 2);
+  showResult('res-ideal',[
+    {label:'Rumus Broca', val: broca.toFixed(1) + ' kg'},
+    {label:'Rumus Devine', val: devine.toFixed(1) + ' kg'},
+    {label:'Rentang BMI Normal', val: bmiLow.toFixed(1) + ' – ' + bmiHigh.toFixed(1) + ' kg'}
+  ]);
+}
+
+// ===== CONVERTER =====
+const convData = {
+  panjang: {
+    label: 'Panjang',
+    units: { mm:1, cm:10, m:1000, km:1e6, inch:25.4, feet:304.8, yard:914.4, mile:1609344 }
+  },
+  berat: {
+    label: 'Berat',
+    units: { mg:0.001, g:1, kg:1000, ton:1e6, ounce:28.3495, pound:453.592 }
+  },
+  suhu: { label:'Suhu', units:{ Celsius:0, Fahrenheit:0, Kelvin:0 }, special:true },
+  luas: {
+    label: 'Luas',
+    units: { 'cm²':1, 'm²':10000, 'km²':1e10, hectare:1e8, acre:4.047e7 }
+  },
+  kecepatan: {
+    label: 'Kecepatan',
+    units: { 'm/s':1, 'km/h':0.27778, mph:0.44704, knot:0.51444 }
+  },
+  volume: {
+    label: 'Volume',
+    units: { ml:1, liter:1000, 'm³':1e6, galon:3785.41, pint:473.176 }
+  }
+};
+let currentCat = 'panjang';
+
+function initConverter() {
+  const pills = document.getElementById('catPills');
+  pills.innerHTML = Object.entries(convData).map(([k,v]) =>
+    `<button class="cat-pill${k===currentCat?' active':''}" onclick="selectCat('${k}',this)">${v.label}</button>`
+  ).join('');
+  loadCatUnits();
+}
+
+function selectCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  loadCatUnits();
+}
+
+function loadCatUnits() {
+  const from = document.getElementById('convFromUnit');
+  const to = document.getElementById('convToUnit');
+  const units = Object.keys(convData[currentCat].units);
+  const opts = units.map(u => `<option value="${u}">${u}</option>`).join('');
+  from.innerHTML = opts;
+  to.innerHTML = opts;
+  if (units.length > 1) to.selectedIndex = 1;
+  convertUnits();
+}
+
+function convertUnits() {
+  const cat = convData[currentCat];
+  const fromU = document.getElementById('convFromUnit').value;
+  const toU = document.getElementById('convToUnit').value;
+  const val = parseFloat(document.getElementById('convInput').value) || 0;
+  let result;
+  if (cat.special) { // temperature
+    let celsius;
+    if (fromU === 'Celsius') celsius = val;
+    else if (fromU === 'Fahrenheit') celsius = (val - 32) * 5/9;
+    else celsius = val - 273.15;
+    if (toU === 'Celsius') result = celsius;
+    else if (toU === 'Fahrenheit') result = celsius * 9/5 + 32;
+    else result = celsius + 273.15;
+  } else {
+    const base = val * cat.units[fromU];
+    result = base / cat.units[toU];
+  }
+  document.getElementById('convOutput').value = parseFloat(result.toFixed(8)).toString();
+}
+
+function swapUnits() {
+  const from = document.getElementById('convFromUnit');
+  const to = document.getElementById('convToUnit');
+  const tmp = from.value;
+  from.value = to.value;
+  to.value = tmp;
+  convertUnits();
+}
+
+// ===== TAX =====
+function taxTab(btn, id) {
+  document.querySelectorAll('#panel-tax .tab-btn').forEach(b => b.classList.toggle('active', b===btn));
+  ['t-pph','t-ppn','t-diskon'].forEach(p => document.getElementById(p).style.display='none');
+  document.getElementById(id).style.display='block';
+}
+
+function calcPPh() {
+  const gajiPerBulan = parseFloat(document.getElementById('pph_gaji').value) || 0;
+  const tunjangan = parseFloat(document.getElementById('pph_tunjangan').value) || 0;
+  const ptkp = parseFloat(document.getElementById('pph_status').value);
+  const penghasilanBruto = (gajiPerBulan + tunjangan) * 12;
+  const biayaJabatan = Math.min(penghasilanBruto * 0.05, 6000000);
+  const penghasilanNeto = penghasilanBruto - biayaJabatan;
+  const pkp = Math.max(penghasilanNeto - ptkp, 0);
+  
+  let pajak = 0;
+  if (pkp <= 60e6) pajak = pkp * 0.05;
+  else if (pkp <= 250e6) pajak = 60e6*0.05 + (pkp-60e6)*0.15;
+  else if (pkp <= 500e6) pajak = 60e6*0.05 + 190e6*0.15 + (pkp-250e6)*0.25;
+  else if (pkp <= 5e9) pajak = 60e6*0.05 + 190e6*0.15 + 250e6*0.25 + (pkp-500e6)*0.30;
+  else pajak = 60e6*0.05 + 190e6*0.15 + 250e6*0.25 + 4500e6*0.30 + (pkp-5e9)*0.35;
+
+  showResult('res-pph',[
+    {label:'Penghasilan Bruto/Tahun', val: fmtRp(penghasilanBruto)},
+    {label:'PTKP', val: fmtRp(ptkp)},
+    {label:'PKP (Kena Pajak)', val: fmtRp(pkp)},
+    {label:'PPh 21/Tahun', val: fmtRp(pajak)},
+    {label:'PPh 21/Bulan', val: fmtRp(pajak/12)},
+    {label:'Gaji Neto/Bulan', val: fmtRp(gajiPerBulan - pajak/12)}
+  ]);
+}
+
+function calcPPN() {
+  const h = parseFloat(document.getElementById('ppn_harga').value) || 0;
+  const r = parseFloat(document.getElementById('ppn_rate').value) || 11;
+  const ppn = h * r / 100;
+  showResult('res-ppn',[
+    {label:'Harga Dasar', val: fmtRp(h)},
+    {label:'PPN ' + r + '%', val: fmtRp(ppn)},
+    {label:'Harga + PPN', val: fmtRp(h + ppn)}
+  ]);
+}
+
+function calcDiskon() {
+  const h = parseFloat(document.getElementById('dk_harga').value) || 0;
+  const d = parseFloat(document.getElementById('dk_diskon').value) || 0;
+  const p = parseFloat(document.getElementById('dk_pajak').value) || 0;
+  const setelahDiskon = h * (1 - d/100);
+  const pajak = setelahDiskon * p / 100;
+  showResult('res-diskon',[
+    {label:'Harga Asli', val: fmtRp(h)},
+    {label:'Diskon ' + d + '%', val: '− ' + fmtRp(h*d/100)},
+    {label:'Setelah Diskon', val: fmtRp(setelahDiskon)},
+    {label:'Pajak ' + p + '%', val: '+ ' + fmtRp(pajak)},
+    {label:'Total Bayar', val: fmtRp(setelahDiskon + pajak)}
+  ]);
+}
+
+// ===== ENGINEERING =====
+function engTab(btn, id) {
+  document.querySelectorAll('#panel-engineering .tab-btn').forEach(b => b.classList.toggle('active', b===btn));
+  ['e-ohm','e-shape','e-volume','e-motion'].forEach(p => document.getElementById(p).style.display='none');
+  document.getElementById(id).style.display='block';
+}
+
+function calcOhm() {
+  const v = document.getElementById('ohm_v').value;
+  const i = document.getElementById('ohm_i').value;
+  const r = document.getElementById('ohm_r').value;
+  const empty = [!v||isNaN(v), !i||isNaN(i), !r||isNaN(r)];
+  const count = empty.filter(Boolean).length;
+  if (count !== 1) { showToast('Isi tepat 2 dari 3 field'); return; }
+  
+  let resV, resI, resR;
+  if (!empty[0] && !empty[1]) { resV=+v; resI=+i; resR=+v/+i; }
+  else if (!empty[0] && !empty[2]) { resV=+v; resR=+r; resI=+v/+r; }
+  else { resI=+i; resR=+r; resV=+i*+r; }
+  
+  showResult('res-ohm',[
+    {label:'Tegangan V', val: resV.toFixed(4) + ' V'},
+    {label:'Arus I', val: resI.toFixed(4) + ' A'},
+    {label:'Hambatan R', val: resR.toFixed(4) + ' Ω'},
+    {label:'Daya P = V×I', val: (resV*resI).toFixed(4) + ' W'}
+  ]);
+}
+
+function calcPower() {
+  const v = parseFloat(document.getElementById('pw_v').value);
+  const i = parseFloat(document.getElementById('pw_i').value);
+  if (!v||!i) { showToast('Lengkapi semua field'); return; }
+  const P = v * i;
+  showResult('res-power',[
+    {label:'Daya (P)', val: P.toFixed(2) + ' W'},
+    {label:'Daya', val: (P/1000).toFixed(4) + ' kW'},
+    {label:'Energi per Jam', val: (P/1000).toFixed(4) + ' kWh'}
+  ]);
+}
+
+const shapeFields = {
+  lingkaran: [{id:'r', label:'Jari-jari (r)'}],
+  segitiga: [{id:'a', label:'Alas (a)'}, {id:'t', label:'Tinggi (t)'}, {id:'s1', label:'Sisi 1'}, {id:'s2', label:'Sisi 2'}, {id:'s3', label:'Sisi 3'}],
+  persegi: [{id:'s', label:'Sisi (s)'}],
+  persegipanjang: [{id:'p', label:'Panjang (p)'}, {id:'l', label:'Lebar (l)'}],
+  trapesium: [{id:'a', label:'Sisi Sejajar a'}, {id:'b', label:'Sisi Sejajar b'}, {id:'t', label:'Tinggi (t)'}],
+  jajarGenjang: [{id:'a', label:'Alas (a)'}, {id:'t', label:'Tinggi (t)'}]
+};
+
+function selectShape(btn, shape) {
+  currentShape = shape;
+  document.querySelectorAll('#shapeGrid .shape-btn').forEach(b => b.classList.toggle('active', b===btn));
+  initShapeInputs();
+}
+
+function initShapeInputs() {
+  const fields = shapeFields[currentShape] || [];
+  document.getElementById('shapeInputs').innerHTML = '<div class="form-row">' +
+    fields.map(f => `<div class="form-group"><label class="form-label">${f.label}</label><input type="number" class="form-input" id="sh_${f.id}" placeholder="0"></div>`).join('') +
+  '</div>';
+  document.getElementById('res-shape').classList.remove('show');
+}
+
+function getShVal(id) { const el = document.getElementById('sh_'+id); return el ? parseFloat(el.value)||0 : 0; }
+
+function calcShape() {
+  let luas, keliling, extra = [];
+  const pi = Math.PI;
+  switch(currentShape) {
+    case 'lingkaran': { const r=getShVal('r'); luas=pi*r*r; keliling=2*pi*r; extra=[{label:'Diameter',val:(2*r).toFixed(4)}]; break; }
+    case 'segitiga': { const a=getShVal('a'),t=getShVal('t'),s1=getShVal('s1')||a,s2=getShVal('s2')||t,s3=getShVal('s3')||0; luas=0.5*a*t; keliling=s1+s2+s3; break; }
+    case 'persegi': { const s=getShVal('s'); luas=s*s; keliling=4*s; break; }
+    case 'persegipanjang': { const p=getShVal('p'),l=getShVal('l'); luas=p*l; keliling=2*(p+l); break; }
+    case 'trapesium': { const a=getShVal('a'),b=getShVal('b'),t=getShVal('t'); luas=0.5*(a+b)*t; keliling=a+b+2*Math.sqrt(t*t+Math.pow((b-a)/2,2)); break; }
+    case 'jajarGenjang': { const a=getShVal('a'),t=getShVal('t'); luas=a*t; keliling=2*(a+t); break; }
+  }
+  const rows = [
+    {label:'Luas', val: luas.toFixed(4) + ' satuan²'},
+    {label:'Keliling', val: keliling.toFixed(4) + ' satuan'},
+    ...extra
+  ];
+  showResult('res-shape', rows);
+}
+
+const volumeFields = {
+  kubus: [{id:'s', label:'Sisi (s)'}],
+  balok: [{id:'p', label:'Panjang'}, {id:'l', label:'Lebar'}, {id:'t', label:'Tinggi'}],
+  tabung: [{id:'r', label:'Jari-jari (r)'}, {id:'t', label:'Tinggi (t)'}],
+  bola: [{id:'r', label:'Jari-jari (r)'}],
+  kerucut: [{id:'r', label:'Jari-jari (r)'}, {id:'t', label:'Tinggi (t)'}],
+  limas: [{id:'a', label:'Alas (a)'}, {id:'b', label:'Lebar Alas'}, {id:'t', label:'Tinggi (t)'}]
+};
+
+function selectVolume(btn, vol) {
+  currentVolume = vol;
+  document.querySelectorAll('#volumeGrid .shape-btn').forEach(b => b.classList.toggle('active', b===btn));
+  initVolumeInputs();
+}
+
+function initVolumeInputs() {
+  const fields = volumeFields[currentVolume] || [];
+  document.getElementById('volumeInputs').innerHTML = '<div class="form-row">' +
+    fields.map(f => `<div class="form-group"><label class="form-label">${f.label}</label><input type="number" class="form-input" id="vl_${f.id}" placeholder="0"></div>`).join('') +
+  '</div>';
+  document.getElementById('res-volume').classList.remove('show');
+}
+
+function getVlVal(id) { const el = document.getElementById('vl_'+id); return el ? parseFloat(el.value)||0 : 0; }
+
+function calcVolume() {
+  let vol, ls, extra=[];
+  const pi = Math.PI;
+  switch(currentVolume) {
+    case 'kubus': { const s=getVlVal('s'); vol=s**3; ls=6*s*s; break; }
+    case 'balok': { const p=getVlVal('p'),l=getVlVal('l'),t=getVlVal('t'); vol=p*l*t; ls=2*(p*l+p*t+l*t); break; }
+    case 'tabung': { const r=getVlVal('r'),t=getVlVal('t'); vol=pi*r*r*t; ls=2*pi*r*(r+t); break; }
+    case 'bola': { const r=getVlVal('r'); vol=4/3*pi*r**3; ls=4*pi*r*r; break; }
+    case 'kerucut': { const r=getVlVal('r'),t=getVlVal('t'),s=Math.sqrt(r*r+t*t); vol=1/3*pi*r*r*t; ls=pi*r*(r+s); break; }
+    case 'limas': { const a=getVlVal('a'),b=getVlVal('b'),t=getVlVal('t'); vol=1/3*a*b*t; ls=a*b+2*(0.5*a*Math.sqrt(t*t+(b/2)**2))+2*(0.5*b*Math.sqrt(t*t+(a/2)**2)); break; }
+  }
+  showResult('res-volume',[
+    {label:'Volume', val: vol.toFixed(4) + ' satuan³'},
+    {label:'Luas Permukaan', val: ls.toFixed(4) + ' satuan²'}
+  ]);
+}
+
+function calcMotion() {
+  const v = document.getElementById('mo_v').value;
+  const s = document.getElementById('mo_s').value;
+  const t = document.getElementById('mo_t').value;
+  const empty = [!v||isNaN(v), !s||isNaN(s), !t||isNaN(t)];
+  const count = empty.filter(Boolean).length;
+  if (count !== 1) { showToast('Isi tepat 2 dari 3 field'); return; }
+  let rv, rs, rt;
+  if (!empty[0] && !empty[1]) { rv=+v; rs=+s; rt=+s/+v; }
+  else if (!empty[0] && !empty[2]) { rv=+v; rt=+t; rs=+v*+t; }
+  else { rs=+s; rt=+t; rv=+s/+t; }
+  showResult('res-motion',[
+    {label:'Kecepatan (v)', val: rv.toFixed(4) + ' m/s (' + (rv*3.6).toFixed(2) + ' km/h)'},
+    {label:'Jarak (s)', val: rs.toFixed(4) + ' m (' + (rs/1000).toFixed(4) + ' km)'},
+    {label:'Waktu (t)', val: rt.toFixed(4) + ' detik (' + (rt/60).toFixed(3) + ' menit)'}
+  ]);
+}
+
+// ===== EXPORT =====
+function exportResult() {
+  const val = document.getElementById('displayValue').textContent;
+  const hist = document.getElementById('displayHistory').textContent;
+  const histText = history.slice(0,10).map(h => `${h.expr} ${h.result}`).join('\n');
+  const text = `RAVEN KALKULATOR\n${'='.repeat(30)}\nHasil: ${val}\n${hist ? 'Terakhir: '+hist : ''}\n\nRIWAYAT:\n${histText || 'Kosong'}`;
+  
+  // Simple text download
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'raven-kalkulator-' + Date.now() + '.txt';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('File diekspor!');
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._to);
+  t._to = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===== KEYBOARD INPUT =====
+document.addEventListener('keydown', e => {
+  if (!['standard','scientific'].includes(currentMode)) return;
+  if (['0','1','2','3','4','5','6','7','8','9'].includes(e.key)) inputNum(e.key);
+  else if (e.key === '.') inputDot();
+  else if (e.key === '+') inputOp('+');
+  else if (e.key === '-') inputOp('−');
+  else if (e.key === '*') inputOp('×');
+  else if (e.key === '/') { e.preventDefault(); inputOp('÷'); }
+  else if (e.key === '%') inputOp('%');
+  else if (e.key === 'Enter' || e.key === '=') calculate();
+  else if (e.key === 'Backspace') delChar();
+  else if (e.key === 'Escape') clearAll();
+});
+
+// ===== INIT =====
+initConverter();
+initShapeInputs();
+initVolumeInputs();
+updateDisplay('0');
+</script>
+</body>
+</html>
